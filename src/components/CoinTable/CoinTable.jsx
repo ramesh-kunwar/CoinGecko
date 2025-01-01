@@ -1,19 +1,35 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { fetchCoinData } from "../../services/fetchCoinData";
+import { useQuery } from "react-query";
 
 const CoinTable = () => {
-  async function download() {
-    const url = "https://api.coingecko.com/api/v3/ping";
-    const response = await fetch(url);
-    const result = await response.json();
-    console.log(result, "  result");
-    return result;
-  }
-  useEffect(() => {
-    //
-    download();
-  }, []);
+  const [page, setPage] = useState(1);
+  const { data, isLoading, isError, isFetching, error } = useQuery(
+    ["coing", page],
+    () => fetchCoinData(page, "usd"),
+    {
+      retry: 2,
+      retryDelay: 1000,
+      cacheTime: 1000 * 60 * 5,
+    },
+  );
 
-  return <div>CoinTable</div>;
+  useEffect(() => {
+    console.log(data, " Data");
+  }, [data]);
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+  if (isError) {
+    return <div>Error: {error.message}</div>;
+  }
+  return (
+    <div>
+      CoinTable
+      <button onClick={() => setPage(page + 1)}>Click</button>
+      <p>Page: {page}</p>
+    </div>
+  );
 };
 
 export default CoinTable;
