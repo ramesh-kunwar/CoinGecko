@@ -1,12 +1,15 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { fetchCoinData } from "../../services/fetchCoinData";
 import { useQuery } from "react-query";
+import { CurrencyContext } from "../../context/CurrencyContext";
 
 const CoinTable = () => {
+  const { currency } = useContext(CurrencyContext);
+  console.log(currency, " currency");
   const [page, setPage] = useState(1);
   const { data, isLoading, isError, isFetching, error } = useQuery(
     ["coing", page],
-    () => fetchCoinData(page, "usd"),
+    () => fetchCoinData(page, currency),
     {
       // retry: 2,
       // retryDelay: 1000,
@@ -40,9 +43,11 @@ const CoinTable = () => {
                   <img src={coin.image} alt={coin.name} className="w-8 h-8" />
                   <div className="flex flex-col">
                     <div className="text-3xl">{coin.name}</div>
+
                     <div className="text-xl">{coin.symbol}</div>
                   </div>
                 </div>
+                <div className="basis-[25%]">{coin.currency}</div>
                 <div className="basis-[25%]">{coin.high_24h}</div>
                 <div className="basis-[20%]">{coin.price_change_24h}</div>
                 <div className="basis-[20%]">{coin.market_cap}</div>
